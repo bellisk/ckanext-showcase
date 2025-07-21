@@ -9,7 +9,7 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
 import ckan.lib.plugins as lib_plugins
 import ckan.lib.helpers as h
-
+from ckan.lib.munge import munge_title_to_name
 
 from ckanext.showcase import cli
 from ckanext.showcase import utils
@@ -171,6 +171,16 @@ class ShowcasePlugin(plugins.SingletonPlugin, lib_plugins.DefaultDatasetForm):
             search_params.update({'fq': fq + " -" + filter})
         return search_params
 
+    def before_dataset_index(self, pkg_dict):
+        '''Modify pkg_dict that is sent to Solr for indexing.'''
+        if pkg_dict["type"] != DATASET_TYPE_NAME:
+            return pkg_dict
+
+        title_string = pkg_dict["title_string"]
+        pkg_dict["title_string"] = munge_title_to_name(title_string)
+
+        return pkg_dict
+
     # CKAN < 2.10 (Remove when dropping support for 2.9)
     def after_show(self, context, pkg_dict):
         '''Modify package_show pkg_dict.'''
@@ -187,6 +197,10 @@ class ShowcasePlugin(plugins.SingletonPlugin, lib_plugins.DefaultDatasetForm):
         `showcase`.
         '''
         return self.before_dataset_search(search_params)
+
+    def before_index(self, pkg_dict):
+        '''Modify pkg_dict that is sent to Solr for indexing.'''
+        return self.before_dataset_index(pkg_dict)
 
     # ITranslation
     def i18n_directory(self):
