@@ -29,6 +29,42 @@ class TestShowcaseIndex(object):
         assert "1 showcase found" in response.body
         assert "my-showcase" in response.body
 
+    def test_showcases_sorted_by_title_string(self, app):
+        """
+        When the showcase index page is sorted by 'Name Ascending/Descending':
+        - lower case titles are sorted together with upper case ones
+        - accented characters are not sorted separately at the end
+        - special characters like " are not sorted separately at the beginning
+        """
+        factories.Dataset(type="showcase", title="Bob's Showcase")
+        factories.Dataset(type="showcase", title="anna's Showcase")
+        factories.Dataset(type="showcase", title="Ömer's Showcase")
+        factories.Dataset(type="showcase", title='"Petra"\'s Showcase')
+
+        response = app.get("/showcase?sort=title_string+asc", status=200)
+        soup = BeautifulSoup(response.body)
+
+        assert len(soup.select("li.media-item")) == 4
+        sorted_titles = [h3.text for h3 in soup.find_all("h3")]
+        assert sorted_titles == [
+            "anna's Showcase",
+            "Bob's Showcase",
+            "Ömer's Showcase",
+            '"Petra"\'s Showcase',
+        ]
+
+        response = app.get("/showcase?sort=title_string+desc", status=200)
+        soup = BeautifulSoup(response.body)
+
+        assert len(soup.select("li.media-item")) == 4
+        sorted_titles = [h3.text for h3 in soup.find_all("h3")]
+        assert sorted_titles == [
+            '"Petra"\'s Showcase',
+            "Ömer's Showcase",
+            "Bob's Showcase",
+            "anna's Showcase",
+        ]
+
 
 @pytest.mark.usefixtures("with_plugins", "clean_db", "clean_index")
 class TestShowcaseNewView(object):
