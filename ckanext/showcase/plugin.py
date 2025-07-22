@@ -173,11 +173,11 @@ class ShowcasePlugin(plugins.SingletonPlugin, lib_plugins.DefaultDatasetForm):
 
     def before_dataset_index(self, pkg_dict):
         '''Modify pkg_dict that is sent to Solr for indexing.'''
-        if pkg_dict["type"] != DATASET_TYPE_NAME:
+        if pkg_dict['type'] != DATASET_TYPE_NAME:
             return pkg_dict
 
-        title_string = pkg_dict["title_string"]
-        pkg_dict["title_string"] = munge_title_to_name(title_string)
+        title_string = pkg_dict.get('title_string', '')
+        pkg_dict['title_string'] = munge_title_to_name(title_string)
 
         return pkg_dict
 
