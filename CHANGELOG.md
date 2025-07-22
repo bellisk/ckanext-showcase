@@ -1,5 +1,18 @@
 # Ckanext-showcase CHANGELOG
 
+## v1.8.4 2025-07-22
+
+* Remove unused add_datasets.html template (#186)
+* Munge title strings for better sorting (#187)
+
+## v1.8.3 2025-02-05
+
+* Remove deprecated highlight_actions-attribute from breadcrumbs in templates (#179)
+
+## v1.8.2 2025-02-05
+
+* Clean up c object from templates (#178)
+
 ## v1.8.1 2025-01-29
 
 *  Fixes delete and update showcase buttons (#173)
